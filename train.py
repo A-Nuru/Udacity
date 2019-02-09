@@ -58,13 +58,13 @@ def process_data(data_dir):
 def pretrained_model(arch):
     if arch == "vgg16":
         model = models.vgg16(pretrained=True)
-        # load_model.name = 'vgg16'
         print('Using vgg16')
-    elif arch == "densenet":
-        model = models.densenet121(pretrained=True)
-        print('Using densenet121')
+    elif arch == "resnet18":
+        model = models.squeezenet1_0(pretrained=True)
+        print('Using squeezenet1_0')
     elif arch == "alexnet":
          model = models.alexnet(pretrained=True)
+         print("Using alexnet")
        
     return model
         
