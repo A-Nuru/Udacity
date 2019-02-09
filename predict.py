@@ -15,7 +15,7 @@ def arg_parse():
     # adding arguments to the paser(parser object)
     paser.add_argument('--gpu', type=bool, default='True', help='True: gpu, False: cpu')
     paser.add_argument('--image_path', type=str, default='flowers/test/1/image_06743.jpg', help='stored image path')
-    
+    # checkpoint = saving directory
     paser.add_argument('--checkpoint', type=str, default='checkpoint.pth', help='save trained model to a file')
     paser.add_argument('--top_k', type=int, default= 5, help='display top class probabilities')
     paser.add_argument('--cat_to_name_json', type=str, default='cat_to_name.json', help='mapper path from category to name')
@@ -31,7 +31,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def load_checkpoint(checkpoint_pth):
     checkpoint = torch.load(checkpoint_pth)
     
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     # Getting the model architecture
     if checkpoint['arch'] == 'alexnet':
@@ -39,7 +39,7 @@ def load_checkpoint(checkpoint_pth):
     elif checkpoint['arch'] == 'vgg16':
         model = models.vgg16(pretrained=True)
     elif checkpoint['arch'] == 'densenet121':
-        model = models.densenet121(pretrained=True)
+        model = models.squeezenet1_0(pretrained=True)
     else:
         print("Model arch not found.")
     
@@ -157,7 +157,6 @@ def main():
     #model.to(device);
     
     is_gpu = args.gpu
-
     use_cuda = torch.cuda.is_available()
     device = torch.device("cpu")
     if is_gpu and use_cuda:
@@ -167,7 +166,6 @@ def main():
     else:
         device = torch.device("cpu")
         print(f"Device set to {device}")
-
                 
     # mapping index to top_classes and top classes names
     with open(args.cat_to_name_json, 'r') as f:
