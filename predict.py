@@ -15,9 +15,10 @@ def arg_parse():
     # adding arguments to the paser(parser object)
     paser.add_argument('--gpu', type=bool, default='True', help='True: gpu, False: cpu')
     paser.add_argument('--image_path', type=str, default='flowers/test/1/image_06743.jpg', help='stored image path')
+    
     paser.add_argument('--checkpoint', type=str, default='checkpoint.pth', help='save trained model to a file')
-    paser.add_argument('--topk', type=int, default= 5, help='display top class probabilities')
-    paser.add_argument('--args.cat_to_name.json', type=str, default='cat_to_name.json', help='mapper path from category to name')
+    paser.add_argument('--top_k', type=int, default= 5, help='display top class probabilities')
+    paser.add_argument('--cat_to_name_json', type=str, default='cat_to_name.json', help='mapper path from category to name')
     
     # parse args (args is the result of paser after adding arguments)
     args = paser.parse_args()
@@ -113,12 +114,12 @@ def process_image(image_path):
     
     return np_image_arr
 
-image_path = 'flowers/test/1/image_06743.jpg'
-#image_path = ('flowers/test/5/image_05159.jpg')
+img_pth1 = 'flowers/test/1/image_06743.jpg'
+img_pth2 = 'flowers/test/5/image_05159.jpg'
 
 
 # predict function
-def predict_image(image_path, model):
+def predict_image(image_path, model, cat_to_name, top_k):
     with torch.no_grad():
         model.eval()
         model.to(device) # put model on gpu
@@ -132,7 +133,7 @@ def predict_image(image_path, model):
         ps = torch.exp(output)
         #index = output.data.cpu().numpy().argmax()
 
-        top_probs, top_idx = ps.topk(5, dim = 1)
+        top_probs, top_idx = ps.topk(top_k, dim = 1)
         
          # convert from index to class        
         idx_to_class = {value: key for key, value in model.class_to_idx.items()}
@@ -176,7 +177,8 @@ def main():
     model = load_checkpoint(args.checkpoint)
     image = process_image(args.image_path)
        
-    idx_to_class,top_idx_arr, top_idx, top_probs_arr, top_classes, top_classes_names = predict_image(args.image_path, model)
+    idx_to_class,top_idx_arr, top_idx, top_probs_arr, top_classes, top_classes_names = predict_image(args.image_path, model, cat_to_name, args.top_k)
+    #args, args.image_path, model, class_to_idx, idx_to_class, cat_to_name, topk=args.topk
     print(top_probs_arr, top_classes_names)
 
 if __name__ == '__main__':
